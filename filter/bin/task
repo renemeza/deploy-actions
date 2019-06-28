@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+
+if [ -z "$GITHUB_EVENT_PATH" ]; then
+  echo "\$GITHUB_EVENT_PATH is not set"
+  exit 1
+fi
+
+PATTERN=$1
+
+TASK=$(cat "$GITHUB_EVENT_PATH" | jq -r '.deployment.task')
+
+case "$TASK" in
+  "")
+    echo "deployment task is not set"
+    exit 1
+    ;;
+  $PATTERN)
+    echo "$TASK matches $PATTERN"
+    exit 0
+    ;;
+  *)
+    echo "$TASK does not match $PATTERN"
+    exit 78
+esac
